@@ -15,7 +15,7 @@ use WishboxRussianPost\Request\Calculator\CalculatorTariffRequestDto;
 use WishboxRussianPost\Response\Calculator\CalculatorTariffResponseDto;
 use WishboxRussianPost\RussianPostClient;
 
-final class TariffApiTest extends TestCase
+final class CalculatorApiTest extends TestCase
 {
     public function test_calculate_sends_authenticated_request_and_maps_response(): void
     {
@@ -39,7 +39,7 @@ final class TariffApiTest extends TestCase
             ],
         );
 
-        $response = $client->tariff()->calculate(new CalculatorTariffRequestDto(
+        $response = $client->calculator()->calculateTariff(new CalculatorTariffRequestDto(
             mailType: MailType::PostalParcel,
             mailCategory: MailCategory::Ordinary,
             mass: 1_000,

@@ -8,13 +8,20 @@ use WishboxRussianPost\Request\Calculator\CalculatorTariffRequestDto;
 use WishboxRussianPost\Response\Calculator\CalculatorTariffResponseDto;
 use WishboxRussianPost\RussianPostClient;
 
-final readonly class TariffApi
+final readonly class CalculatorApi
 {
     public function __construct(private RussianPostClient $client)
     {
     }
 
-    public function calculate(CalculatorTariffRequestDto $request): CalculatorTariffResponseDto
+    /**
+     * @param CalculatorTariffRequestDto $request
+     *
+     * @return CalculatorTariffResponseDto
+     *
+     * @noinspection PhpUnused
+     */
+    public function calculateTariff(CalculatorTariffRequestDto $request): CalculatorTariffResponseDto
     {
         return $this->client->requestMapped(
             'POST',

@@ -9,7 +9,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use WishboxRussianPost\Api\TariffApi;
+use WishboxRussianPost\Api\CalculatorApi;
 use WishboxRussianPost\Config\RussianPostConfig;
 use WishboxRussianPost\Exception\HttpException;
 use WishboxRussianPost\Exception\TransportException;
@@ -19,10 +19,10 @@ use WishboxRussianPost\Response\RussianPostResponse;
 
 final class RussianPostClient
 {
-    public const BASE_URL = 'https://otpravka-api.pochta.ru';
+    public const string BASE_URL = 'https://otpravka-api.pochta.ru';
 
     private readonly RussianPostConfig $config;
-    private ?TariffApi $tariffApi = null;
+    private ?CalculatorApi $calculatorApi = null;
 
     /**
      * @param array{
@@ -43,9 +43,14 @@ final class RussianPostClient
             : RussianPostConfig::fromArray($config, self::BASE_URL);
     }
 
-    public function tariff(): TariffApi
+    /**
+     * @return CalculatorApi
+     *
+     * @noinspection PhpUnused
+     */
+    public function calculator(): CalculatorApi
     {
-        return $this->tariffApi ??= new TariffApi($this);
+        return $this->calculatorApi ??= new CalculatorApi($this);
     }
 
     /**

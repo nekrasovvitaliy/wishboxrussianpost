@@ -45,7 +45,7 @@ $client = new RussianPostClient(
     ],
 );
 
-$result = $client->tariff()->calculate(new CalculatorTariffRequestDto(
+$result = $client->calculator()->calculateTariff(new CalculatorTariffRequestDto(
     mailType: MailType::PostalParcel,
     mailCategory: MailCategory::Ordinary,
     mass: 1_000,
