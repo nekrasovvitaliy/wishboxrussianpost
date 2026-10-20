@@ -1,3 +1,7 @@
 /docs.html export-ignore
 /.idea export-ignore
 /.phpunit.cache export-ignore
+/.DS_Store export-ignore
+/.env.integration export-ignore
+/.env.integration.example export-ignore
+/tools export-ignore

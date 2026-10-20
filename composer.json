@@ -1,8 +1,26 @@
 {
   "name": "wishbox/russian-post-client",
   "description": "Extensible PHP client for the Russian Post Otpravka API.",
+  "keywords": [
+    "russian-post",
+    "pochta",
+    "otpravka",
+    "shipping",
+    "api-client"
+  ],
+  "homepage": "https://github.com/nekrasovvitaliy/wishboxrussianpost",
   "type": "library",
   "license": "MIT",
+  "authors": [
+    {
+      "name": "Nekrasov Vitaliy",
+      "email": "nekrasov_vitaliy@list.ru"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/nekrasovvitaliy/wishboxrussianpost/issues",
+    "source": "https://github.com/nekrasovvitaliy/wishboxrussianpost"
+  },
   "autoload": {
     "psr-4": {
       "WishboxRussianPost\\": "src/"
