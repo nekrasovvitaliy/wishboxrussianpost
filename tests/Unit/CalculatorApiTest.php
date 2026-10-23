@@ -11,6 +11,7 @@ use Tests\Support\Http\FakeResponse;
 use Tests\Support\Http\FakeStreamFactory;
 use WishboxRussianPost\Enum\MailCategory;
 use WishboxRussianPost\Enum\MailType;
+use WishboxRussianPost\Exception\UnexpectedResponseException;
 use WishboxRussianPost\Request\Calculator\CalculatorTariffRequestDto;
 use WishboxRussianPost\Response\Calculator\CalculatorTariffResponseDto;
 use WishboxRussianPost\RussianPostClient;
@@ -75,5 +76,44 @@ final class CalculatorApiTest extends TestCase
             ], JSON_THROW_ON_ERROR),
             (string) $sentRequest->getBody(),
         );
+    }
+
+    public function test_calculate_throws_when_successful_http_response_contains_tariff_errors(): void
+    {
+        $description = 'Courier delivery is not available for the recipient.';
+        $httpClient = new FakeHttpClient([
+            new FakeResponse(200, json_encode([
+                'errors' => [[
+                    'code' => 'TARIFF_ERROR',
+                    'description' => $description,
+                ]],
+                'total-rate' => 0,
+                'total-vat' => 0,
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+        $client = new RussianPostClient(
+            $httpClient,
+            new FakeRequestFactory(),
+            new FakeStreamFactory(),
+            [
+                'base_url' => 'https://example.test',
+                'access_token' => 'application-token',
+                'user_authorization' => 'user-key',
+            ],
+        );
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage('TARIFF_ERROR: ' . $description);
+
+        $client->calculator()->calculateTariff(new CalculatorTariffRequestDto(
+            mailType: MailType::OnlineCourier,
+            mailCategory: MailCategory::Ordinary,
+            mass: 1_000,
+            inventory: false,
+            withOrderOfNotice: false,
+            withSimpleNotice: false,
+            indexFrom: '690000',
+            indexTo: '101000',
+        ));
     }
 }
