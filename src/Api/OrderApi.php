@@ -33,13 +33,14 @@ final readonly class OrderApi
         $this->createOrderValidator->validate($request);
 
         return $this->client->requestMapped(
-            'POST',
+            'PUT',
             '/1.0/user/backlog',
             [
+                200 => OrderCreateResponseDto::class,
                 202 => OrderCreateResponseDto::class,
             ],
             [],
-            $request->toArray()
+            [$request->toArray()]
         );
     }
 

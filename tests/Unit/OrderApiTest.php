@@ -13,12 +13,60 @@ use Tests\Support\Http\FakeStreamFactory;
 use WishboxRussianPost\Api\OrderApi;
 use WishboxRussianPost\Enum\MailCategory;
 use WishboxRussianPost\Enum\MailType;
+use WishboxRussianPost\Request\Order\OrderCreateRequestDto;
 use WishboxRussianPost\Request\Order\OrderUpdateRequestDto;
+use WishboxRussianPost\Response\Order\OrderCreateResponseDto;
 use WishboxRussianPost\Response\Order\OrderUpdateResponseDto;
 use WishboxRussianPost\RussianPostClient;
 
 final class OrderApiTest extends TestCase
 {
+    public function test_create_sends_put_request_with_order_list_and_maps_response(): void
+    {
+        $httpClient = new FakeHttpClient([
+            new FakeResponse(200, '{"result-ids":[456],"errors":[]}'),
+        ]);
+        $api = new OrderApi(new RussianPostClient(
+            $httpClient,
+            new FakeRequestFactory(),
+            new FakeStreamFactory(),
+            [
+                'base_url' => 'https://example.test',
+                'access_token' => 'application-token',
+                'user_authorization' => 'user-key',
+            ],
+        ));
+
+        $response = $api->create($this->createCreateRequest());
+
+        self::assertInstanceOf(OrderCreateResponseDto::class, $response);
+        self::assertSame([456], $response->resultIds);
+        self::assertCount(1, $httpClient->requests);
+
+        $sentRequest = $httpClient->requests[0];
+
+        self::assertSame('PUT', $sentRequest->getMethod());
+        self::assertSame('https://example.test/1.0/user/backlog', (string) $sentRequest->getUri());
+        self::assertJsonStringEqualsJsonString(
+            json_encode([[
+                'address-type-to' => 'DEFAULT',
+                'fragile' => false,
+                'mail-category' => 'ORDINARY',
+                'mail-direct' => 643,
+                'mail-type' => 'ONLINE_PARCEL',
+                'mass' => 710,
+                'order-num' => 'WC-0000161026',
+                'postoffice-code' => '344029',
+                'recipient-name' => 'Иванов Иван Иванович',
+                'index-to' => 119415,
+                'tel-address' => 71111111111,
+                'tel-address-from' => 71111111111,
+                'tariff-count' => 1,
+            ]], JSON_THROW_ON_ERROR),
+            (string) $sentRequest->getBody(),
+        );
+    }
+
     public function test_update_sends_put_request_and_maps_response(): void
     {
         $httpClient = new FakeHttpClient([
@@ -87,6 +135,22 @@ final class OrderApiTest extends TestCase
             orderNum: 'ORDER-123',
             postofficeCode: '101000',
             recipientName: 'Иванов Иван Иванович',
+        );
+    }
+
+    private function createCreateRequest(): OrderCreateRequestDto
+    {
+        return new OrderCreateRequestDto(
+            mailType: MailType::OnlineParcel,
+            mailCategory: MailCategory::Ordinary,
+            mass: 710,
+            orderNum: 'WC-0000161026',
+            postofficeCode: '344029',
+            recipientName: 'Иванов Иван Иванович',
+            tariffCount: 1,
+            indexTo: 119415,
+            telAddress: 71111111111,
+            telAddressFrom: 71111111111,
         );
     }
 }
