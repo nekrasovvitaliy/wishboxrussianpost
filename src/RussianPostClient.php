@@ -10,6 +10,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use WishboxRussianPost\Api\CalculatorApi;
+use WishboxRussianPost\Api\OrderApi;
 use WishboxRussianPost\Config\RussianPostConfig;
 use WishboxRussianPost\Exception\HttpException;
 use WishboxRussianPost\Exception\TransportException;
@@ -23,6 +24,7 @@ final class RussianPostClient
 
     private readonly RussianPostConfig $config;
     private ?CalculatorApi $calculatorApi = null;
+    private ?OrderApi $orderApi = null;
 
     /**
      * @param array{
@@ -51,6 +53,11 @@ final class RussianPostClient
     public function calculator(): CalculatorApi
     {
         return $this->calculatorApi ??= new CalculatorApi($this);
+    }
+
+    public function orders(): OrderApi
+    {
+        return $this->orderApi ??= new OrderApi($this);
     }
 
     /**

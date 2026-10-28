@@ -14,8 +14,11 @@ abstract readonly class RequestData
      *
      * @return array<string, mixed>
      */
-    protected function withoutNulls(array $data): array
+    protected function filterNulls(array $data): array
     {
-        return array_filter($data, static fn (mixed $value): bool => $value !== null);
+        return array_filter(
+            $data,
+            static fn(mixed $value): bool => $value !== null
+        );
     }
 }

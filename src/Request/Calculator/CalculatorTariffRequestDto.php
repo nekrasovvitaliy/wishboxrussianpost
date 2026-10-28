@@ -60,7 +60,7 @@ final readonly class CalculatorTariffRequestDto extends RequestData
 
     public function toArray(): array
     {
-        return $this->withoutNulls([
+        return $this->filterNulls([
             'completeness-checking' => $this->completenessChecking,
             'contents-checking' => $this->contentsChecking,
             'courier' => $this->courier,
