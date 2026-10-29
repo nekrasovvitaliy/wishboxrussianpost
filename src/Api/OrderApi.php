@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace WishboxRussianPost\Api;
 
 use InvalidArgumentException;
+use WishboxRussianPost\Exception\UnexpectedResponseException;
+use WishboxRussianPost\Request\Order\GetOrderByNumberRequest;
 use WishboxRussianPost\Request\Order\OrderUpdateRequestDto;
 use WishboxRussianPost\Response\Order\OrderResponseDto;
 use WishboxRussianPost\Response\Order\OrderUpdateResponseDto;
@@ -56,6 +58,37 @@ final readonly class OrderApi
                 200 => OrderResponseDto::class
             ]
         );
+    }
+
+    /**
+     * Returns orders matching the number assigned by the merchant.
+     *
+     * @return list<OrderResponseDto>
+     */
+    public function getByNumber(string $number): array
+    {
+        $request = new GetOrderByNumberRequest($number);
+        $data = $this->client->request(
+            'GET',
+            '/1.0/backlog/search',
+            $request->toArray(),
+        );
+
+        if (!array_is_list($data)) {
+            throw new UnexpectedResponseException('The order search response must be a list.');
+        }
+
+        $orders = [];
+
+        foreach ($data as $order) {
+            if (!is_array($order)) {
+                throw new UnexpectedResponseException('Each order search result must be an object.');
+            }
+
+            $orders[] = OrderResponseDto::fromArray($order);
+        }
+
+        return $orders;
     }
 
     /**

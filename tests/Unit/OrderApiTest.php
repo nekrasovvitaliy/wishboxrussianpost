@@ -16,6 +16,7 @@ use WishboxRussianPost\Enum\MailType;
 use WishboxRussianPost\Request\Order\OrderCreateRequestDto;
 use WishboxRussianPost\Request\Order\OrderUpdateRequestDto;
 use WishboxRussianPost\Response\Order\OrderCreateResponseDto;
+use WishboxRussianPost\Response\Order\OrderResponseDto;
 use WishboxRussianPost\Response\Order\OrderUpdateResponseDto;
 use WishboxRussianPost\RussianPostClient;
 
@@ -105,6 +106,40 @@ final class OrderApiTest extends TestCase
                 'recipient-name' => 'Иванов Иван Иванович',
             ], JSON_THROW_ON_ERROR),
             (string) $sentRequest->getBody(),
+        );
+    }
+
+    public function test_get_by_number_sends_search_request_and_maps_order_list(): void
+    {
+        $httpClient = new FakeHttpClient([
+            new FakeResponse(200, '[{"id":123,"order-num":"ORDER-123","barcode":"10100012345678"}]'),
+        ]);
+        $api = new OrderApi(new RussianPostClient(
+            $httpClient,
+            new FakeRequestFactory(),
+            new FakeStreamFactory(),
+            [
+                'base_url' => 'https://example.test',
+                'access_token' => 'application-token',
+                'user_authorization' => 'user-key',
+            ],
+        ));
+
+        $orders = $api->getByNumber('ORDER-123');
+
+        self::assertCount(1, $orders);
+        self::assertInstanceOf(OrderResponseDto::class, $orders[0]);
+        self::assertSame(123, $orders[0]->id);
+        self::assertSame('ORDER-123', $orders[0]->orderNum);
+        self::assertSame('10100012345678', $orders[0]->barcode);
+        self::assertCount(1, $httpClient->requests);
+
+        $sentRequest = $httpClient->requests[0];
+
+        self::assertSame('GET', $sentRequest->getMethod());
+        self::assertSame(
+            'https://example.test/1.0/backlog/search?query=ORDER-123',
+            (string) $sentRequest->getUri(),
         );
     }
 
