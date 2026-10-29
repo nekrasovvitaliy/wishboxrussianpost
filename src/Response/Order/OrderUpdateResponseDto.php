@@ -23,6 +23,13 @@ final readonly class OrderUpdateResponseDto
     /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        if ($data === []) {
+            return new self(
+                errorCodes: [],
+                rawData: $data,
+            );
+        }
+
         $orderError = OrderErrorDto::fromArray($data);
 
         return new self(

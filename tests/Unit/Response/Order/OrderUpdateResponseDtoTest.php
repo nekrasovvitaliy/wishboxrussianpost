@@ -25,6 +25,17 @@ final class OrderUpdateResponseDtoTest extends TestCase
         self::assertSame($data, $response->rawData);
     }
 
+    public function test_it_maps_an_empty_successful_update_response(): void
+    {
+        $response = OrderUpdateResponseDto::fromArray([]);
+
+        self::assertSame([], $response->errorCodes);
+        self::assertSame([], $response->getErrors());
+        self::assertNull($response->position);
+        self::assertFalse($response->hasErrors());
+        self::assertSame([], $response->rawData);
+    }
+
     public function test_it_maps_error_codes_and_position(): void
     {
         $data = [
@@ -51,10 +62,10 @@ final class OrderUpdateResponseDtoTest extends TestCase
         self::assertSame($data, $response->rawData);
     }
 
-    public function test_it_rejects_a_response_without_an_error_codes_list(): void
+    public function test_it_rejects_a_non_empty_response_without_an_error_codes_list(): void
     {
         $this->expectException(UnexpectedResponseException::class);
 
-        OrderUpdateResponseDto::fromArray([]);
+        OrderUpdateResponseDto::fromArray(['position' => 0]);
     }
 }

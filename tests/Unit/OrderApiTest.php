@@ -71,7 +71,7 @@ final class OrderApiTest extends TestCase
     public function test_update_sends_put_request_and_maps_response(): void
     {
         $httpClient = new FakeHttpClient([
-            new FakeResponse(200, '{"error-codes":[]}'),
+            new FakeResponse(200, '{}'),
         ]);
         $api = new OrderApi(new RussianPostClient(
             $httpClient,
